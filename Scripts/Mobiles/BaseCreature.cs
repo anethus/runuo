@@ -251,8 +251,7 @@ namespace Server.Mobiles
 
         private int m_FailedReturnHome; /* return to home failure counter */
 
-        public List<Mobile> synchro;
-        public int distance;
+        public Mobile synchro;
         public Point3D offset;
 
         #endregion
@@ -1718,8 +1717,6 @@ namespace Server.Mobiles
 
             m_bTamable = false;
 
-            synchro = new List<Mobile>();
-
             m_Owners = new List<Mobile>();
 
             m_NextReacquireTime = Core.TickCount + (int)ReacquireDelay.TotalMilliseconds;
@@ -1742,7 +1739,6 @@ namespace Server.Mobiles
             m_arSpellAttack = new List<Type>();
             m_arSpellDefense = new List<Type>();
 
-            synchro = new List<Mobile>();
             m_bDebugAI = false;
         }
 

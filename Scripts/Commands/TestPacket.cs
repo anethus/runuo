@@ -26,6 +26,7 @@ namespace Server.Commands
         {
             if (!(targeted is Mobile mobile))
             {
+                from.SendGump(new PacketTest());
                 return;
             }
             mList.Add(mobile);
@@ -33,19 +34,22 @@ namespace Server.Commands
             if (mList.Count != 1)
             {
                 var master = World.FindMobile(mList[0].Serial) as BaseCreature;
-                (mobile as BaseCreature).synchro.Add(master);
-                if (mList.Count == 2)
-                    (mobile as BaseCreature).offset = new Point3D(-1, 0, 0);
-                if (mList.Count == 3)
-                    (mobile as BaseCreature).offset = new Point3D(1, 0, 0);
-                if (mList.Count == 4)
-                    (mobile as BaseCreature).offset = new Point3D(-1, -1, 0);
-                if (mList.Count == 5)
-                    (mobile as BaseCreature).offset = new Point3D(1, -1, 0);
-            }
-            else
-            {
-                
+                if(mobile is BaseCreature bc)
+                {
+                    bc.synchro = master;
+                    if (mList.Count == 2)
+                        (mobile as BaseCreature).offset = new Point3D(-1, 0, 0);
+                    if (mList.Count == 3)
+                        (mobile as BaseCreature).offset = new Point3D(1, 0, 0);
+                    if (mList.Count == 4)
+                        (mobile as BaseCreature).offset = new Point3D(-1, -1, 0);
+                    if (mList.Count == 5)
+                        (mobile as BaseCreature).offset = new Point3D(1, -1, 0);
+                }
+                else
+                {
+                    from.SendMessage("It's not creature");
+                }
             }
 
             from.SendGump(new PacketTest());
@@ -89,10 +93,6 @@ namespace Server.Commands
                     wp.Movable = false;
                     (m as BaseCreature).CurrentWayPoint = wp;
                     from.SendGump(new PacketTest());
-
-                    //obj?.MoveManyToWorld(obj, point, from.Map);
-                    //Packet p = Packet.Acquire(new MoveMany((byte)mList.Count, mList.ToArray()));
-                    //sender.Mobile.NetState.Send(p);
                 }
             }
         }

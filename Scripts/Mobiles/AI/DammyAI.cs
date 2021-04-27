@@ -13,9 +13,9 @@ namespace Server.Mobiles
 
         public override bool DoActionWander()
         {
-            if (m_Mobile.synchro.Count != 0)
+            if (m_Mobile.synchro != null)
             {
-                if (m_Mobile.GetDistanceToSqrt(m_Mobile.synchro[0].Location) > 1)
+                if (m_Mobile.GetDistanceToSqrt(m_Mobile.synchro.Location) > 1)
                 {
                     Action = ActionType.Flee;
                 }
@@ -28,10 +28,10 @@ namespace Server.Mobiles
         {
             if (m_Mobile.Deleted || m_Mobile.Frozen || m_Mobile.Paralyzed || (m_Mobile.Spell != null && m_Mobile.Spell.IsCasting) || m_Mobile.DisallowAllMoves)
                 return false;
-            var master = m_Mobile.synchro[0].Location;
+            var master = m_Mobile.synchro.Location;
 
-            m_Mobile.Direction = m_Mobile.synchro[0].Direction;
-            m_Mobile.MoveToWorld(master + GetOffset(m_Mobile.synchro[0].Direction & Direction.Mask), m_Mobile.Map);
+            m_Mobile.Direction = m_Mobile.synchro.Direction;
+            m_Mobile.MoveToWorld(master + GetOffset(m_Mobile.synchro.Direction & Direction.Mask), m_Mobile.Map);
 
             return true;
         }
