@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
  *                                Geometry.cs
  *                            -------------------
  *   begin                : May 1, 2002
@@ -348,6 +348,11 @@ namespace Server
                 return false;
 
             return l.m_X != r.X || l.m_Y != r.Y || l.m_Z != r.Z;
+        }
+
+        public static Point3D operator +(Point3D l, IPoint3D r)
+        {
+            return new Point3D { X = l.X + r.X, Y = l.Y + r.Y, Z = l.Z + r.Z };
         }
 
         public int CompareTo(Point3D other)

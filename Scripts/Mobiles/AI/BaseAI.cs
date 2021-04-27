@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using Server.ContextMenus;
@@ -25,7 +25,9 @@ namespace Server.Mobiles
         AI_Mage,
         AI_Berserk,
         AI_Predator,
-        AI_Thief
+        AI_Thief,
+        AI_Synchronus,
+        AI_Dummy
     }
 
     public enum ActionType

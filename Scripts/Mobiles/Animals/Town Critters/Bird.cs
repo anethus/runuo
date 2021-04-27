@@ -1,10 +1,10 @@
-namespace Server.Mobiles
+﻿namespace Server.Mobiles
 {
     [CorpseName("a bird corpse")]
     public class Bird : BaseCreature
     {
         [Constructable]
-        public Bird() : base(AIType.AI_Animal, FightMode.Aggressor, 10, 1, 0.2, 0.4)
+        public Bird() : base(AIType.AI_Synchronus, FightMode.Aggressor, 10, 1, 0.2, 0.4)
         {
             if (Utility.RandomBool())
             {
@@ -25,6 +25,8 @@ namespace Server.Mobiles
 
             Body = 6;
             BaseSoundID = 0x1B;
+            IgnoreMobiles = true;
+           
 
             VirtualArmor = Utility.RandomMinMax(0, 6);
 

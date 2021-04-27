@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
  *                                Packets.cs
  *                            -------------------
  *   begin                : May 1, 2002
@@ -3743,6 +3743,23 @@ namespace Server.Network
             }
 
             m_Stream.Write((int)0); // terminate
+        }
+    }
+
+    public sealed class MoveMany : Packet
+    {
+        public MoveMany(byte cnt, Mobile[] mobiles) : base(0x79)
+        {
+            EnsureCapacity(10 + 16*cnt);
+
+            m_Stream.Write(cnt); 
+            for (byte i = 0; i < cnt; cnt++)
+            {
+                m_Stream.Write(mobiles[i].Serial);
+                m_Stream.Write((short)mobiles[i].X);
+                m_Stream.Write((short)mobiles[i].Y);
+                m_Stream.Write((sbyte)mobiles[i].Z);
+            }
         }
     }
 

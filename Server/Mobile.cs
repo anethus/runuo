@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
  *                                Mobile.cs
  *                            -------------------
  *   begin                : May 1, 2002
@@ -716,7 +716,7 @@ namespace Server
         private int m_SpeechHue, m_EmoteHue, m_WhisperHue, m_YellHue;
         private string m_Language;
         private NetState m_NetState;
-        private bool m_Female, m_Warmode, m_Hidden, m_Blessed, m_Flying;
+        private bool m_Female, m_Warmode, m_Hidden, m_Blessed, m_Flying, m_IgnoreMobiles;
         private int m_StatCap;
         private int m_Str, m_Dex, m_Int;
         private int m_Hits, m_Stam, m_Mana;
@@ -791,6 +791,23 @@ namespace Server
         private static readonly TimeSpan WarmodeSpamCatch = TimeSpan.FromSeconds((Core.SE ? 1.0 : 0.5));
         private static readonly TimeSpan WarmodeSpamDelay = TimeSpan.FromSeconds((Core.SE ? 4.0 : 2.0));
         private const int WarmodeCatchCount = 4; // Allow four warmode changes in 0.5 seconds, any more will be delay for two seconds
+
+        [CommandProperty(AccessLevel.GameMaster)]
+        public bool IgnoreMobiles
+        {
+            get
+            {
+                return m_IgnoreMobiles;
+            }
+            set
+            {
+                if(m_IgnoreMobiles != value)
+                {
+                    m_IgnoreMobiles = value;
+                    Delta(MobileDelta.Flags);
+                }
+            }
+        }
 
         [CommandProperty(AccessLevel.GameMaster)]
         public Race Race
@@ -3123,7 +3140,7 @@ namespace Server
 
                 int newZ;
 
-                if (CheckMovement(d, out newZ))
+                if (CheckMovement(d, out newZ) || m_IgnoreMobiles)
                 {
                     int x = oldLocation.m_X, y = oldLocation.m_Y;
                     int oldX = x, oldY = y;
@@ -3176,12 +3193,15 @@ namespace Server
 
                         if (oldSector != newSector)
                         {
-                            for (int i = 0; i < oldSector.Mobiles.Count; ++i)
+                            if(!m_IgnoreMobiles)
                             {
-                                Mobile m = oldSector.Mobiles[i];
+                                for (int i = 0; i < oldSector.Mobiles.Count; ++i)
+                                {
+                                    Mobile m = oldSector.Mobiles[i];
 
-                                if (m != this && m.X == oldX && m.Y == oldY && (m.Z + 15) > oldZ && (oldZ + 15) > m.Z && !m.OnMoveOff(this))
-                                    return false;
+                                    if (m != this && m.X == oldX && m.Y == oldY && (m.Z + 15) > oldZ && (oldZ + 15) > m.Z && !m.OnMoveOff(this))
+                                        return false;
+                                }
                             }
 
                             for (int i = 0; i < oldSector.Items.Count; ++i)
@@ -3192,14 +3212,17 @@ namespace Server
                                     return false;
                             }
 
-                            for (int i = 0; i < newSector.Mobiles.Count; ++i)
+                            if( !m_IgnoreMobiles )
                             {
-                                Mobile m = newSector.Mobiles[i];
+                                for (int i = 0; i < newSector.Mobiles.Count; ++i)
+                                {
+                                    Mobile m = newSector.Mobiles[i];
 
-                                if (m.X == x && m.Y == y && (m.Z + 15) > newZ && (newZ + 15) > m.Z && !m.OnMoveOver(this))
-                                    return false;
+                                    if (m.X == x && m.Y == y && (m.Z + 15) > newZ && (newZ + 15) > m.Z && !m.OnMoveOver(this))
+                                        return false;
+                                }
                             }
-
+                            
                             for (int i = 0; i < newSector.Items.Count; ++i)
                             {
                                 Item item = newSector.Items[i];
@@ -3210,14 +3233,17 @@ namespace Server
                         }
                         else
                         {
-                            for (int i = 0; i < oldSector.Mobiles.Count; ++i)
+                            if (!m_IgnoreMobiles)
                             {
-                                Mobile m = oldSector.Mobiles[i];
+                                for (int i = 0; i < oldSector.Mobiles.Count; ++i)
+                                {
+                                    Mobile m = oldSector.Mobiles[i];
 
-                                if (m != this && m.X == oldX && m.Y == oldY && (m.Z + 15) > oldZ && (oldZ + 15) > m.Z && !m.OnMoveOff(this))
-                                    return false;
-                                else if (m.X == x && m.Y == y && (m.Z + 15) > newZ && (newZ + 15) > m.Z && !m.OnMoveOver(this))
-                                    return false;
+                                    if (m != this && m.X == oldX && m.Y == oldY && (m.Z + 15) > oldZ && (oldZ + 15) > m.Z && !m.OnMoveOff(this))
+                                        return false;
+                                    else if (m.X == x && m.Y == y && (m.Z + 15) > newZ && (newZ + 15) > m.Z && !m.OnMoveOver(this))
+                                        return false;
+                                }
                             }
 
                             for (int i = 0; i < oldSector.Items.Count; ++i)
@@ -3440,6 +3466,8 @@ namespace Server
 
         public virtual bool CheckShove(Mobile shoved)
         {
+            if (m_IgnoreMobiles)
+                return true;
             if ((m_Map.Rules & MapRules.FreeMovement) == 0)
             {
                 if (!shoved.Alive || !Alive || shoved.IsDeadBondedPet || IsDeadBondedPet)
@@ -7965,6 +7993,9 @@ namespace Server
 
             if (m_Blessed || m_YellowHealthbar)
                 flags |= 0x08;
+
+            if (m_IgnoreMobiles)
+                flags |= 0x10;
 
             if (m_Warmode)
                 flags |= 0x40;
