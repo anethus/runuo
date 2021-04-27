@@ -18,9 +18,22 @@
             if (m_Mobile.CurrentWayPoint != null)
             {
                 var wp = m_Mobile.CurrentWayPoint;
-                
+
                 if ((wp.X != m_Mobile.Location.X || wp.Y != m_Mobile.Location.Y) && !wp.Deleted)
-                    DoMove(m_Mobile.GetDirectionTo(m_Mobile.CurrentWayPoint) | Direction.Running, true);
+                {
+                    var d = m_Mobile.GetDirectionTo(m_Mobile.CurrentWayPoint);
+                    // Differential move.....
+                    // When direction is switched external mob need to move faster then internal....
+                    // need to find way to internal mob dont go back
+                    if (d != (m_Mobile.Direction & Direction.Mask))
+                    {
+                        m_Mobile.Direction = d;
+                    }
+                    else
+                    {
+                        DoMove(d | Direction.Running, true);
+                    }
+                }
                 else
                 {
                     if (wp.NextPoint != null)
